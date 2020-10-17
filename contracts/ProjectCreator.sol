@@ -13,6 +13,7 @@ contract ProjectCreator{
         mapping ( uint=> Transaction) transactions;
         uint transactionSize;
         uint spentAmount;
+        uint index;
     }
     struct Transaction{
         Project p;
@@ -50,7 +51,7 @@ contract ProjectCreator{
         uint repTokensBalance = rep.balanceOf(msg.sender);
         uint ratio = transactionCount/repTokensBalance;
         require(ratio <=2,"Reputation too low to create a project!");
-        p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0});
+        p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0,index: projectCount[msg.sender]});
         // p = Project(_name,_desc,_value,msg.sender,0,_value,transactions[-1] = t,0);
         projects[msg.sender].push(p);
         projectList[pCount]=p;
@@ -184,35 +185,3 @@ contract ProjectCreator{
         emit ViewAllTransactions(purpose,value,proofLink,admin,verified,transactionIndex);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
