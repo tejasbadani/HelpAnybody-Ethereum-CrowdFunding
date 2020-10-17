@@ -140,7 +140,7 @@ App = {
     await App.renderMyProjects()
 
     //Render All Moderator
-
+    await App.returnModTokenBalance()
     //Render All Donor
 
     // Update loading state
@@ -187,6 +187,16 @@ SET_DONOR: async () => {
 },
 // END OF MAIN PAGE FUNCTIONS
 
+//MODERATOR FUNCTIONS
+
+  returnModTokenBalance: async () => {
+    const $viewModTokenBalance = $('#viewModTokenHTML');
+    const value = await App.M.viewModeratorTokenBalance.call();
+    console.log("HELLO THERE",value.toNumber());
+    $('#balanceMod').html(value.toNumber());
+    // $viewModTokenBalance.find('modbalance').html(value)
+    // $viewModTokenBalance.show()
+  },
 
 
 
@@ -270,6 +280,7 @@ SET_DONOR: async () => {
       }
     }
   },
+
 
   createProject: async () => {
     App.setLoading(110)
