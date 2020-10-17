@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>List</title>
+
+    <!-- Bootstrap -->
+    <link href="vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      body {
+        font-family: 'Lato', sans-serif;
+      }
+      .sidenav {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+      }
+
+      .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #ffffff;
+        display: block;
+        transition: 0.3s;
+      }
+
+      .sidenav a:hover {
+        color: #f1f1f1;
+      }
+
+      .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+      }
+      @media screen and (max-height: 450px) {
+        .sidenav {
+          padding-top: 15px;
+        }
+        .sidenav a {
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="MAIN-PAGE">
+      <div onclick="App.SET_PROJECT_CREATOR()">Project Creator</div>
+      <div onclick="App.SET_MODERATOR()">Moderator</div>
+      <div onclick="App.SET_DONOR()">Donor</div>
+    </div>
+
+    <div id="PROJECT-CREATOR">
+      <!-- SIDEBAR -->
+      <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+          &times;
+        </a>
+        <a onclick="App.goToHome()">Home</a>
+        <a onclick="App.goToCreate()">Create A Project</a>
+        <a onclick="App.goToViewMyProjects()">View My Projects</a>
+        <a onclick="App.goToViewAllProjects()">View All Projects</a>
+        <a onclick="App.goToViewAllAdmins()">View All Admins</a>
+        <a onclick="App.goToWithdraw()">Withdraw from a Project</a>
+        <a onclick="App.goToViewTransactions()">View All Transactions</a>
+        <a onclick="App.goToSubmitProof()">Submit Proof</a>
+        <a onclick="App.goToViewRepTokens()">View Reputation Tokens</a>
+      </div>
+      <script>
+        function openNav() {
+          document.getElementById('mySidenav').style.width = '250px'
+        }
+
+        function closeNav() {
+          document.getElementById('mySidenav').style.width = '0'
+        }
+      </script>
+
+      <div>
+        <span style="font-size: 30px; cursor: pointer;" onclick="openNav()">
+          &#9776;
+        </span>
+      </div>
+      <!-- SIDEBAR -->
+
+      <div id="loader" class="text-center">
+        <p class="text-center">Loading...</p>
+      </div>
+
+      <div id="createProjectHTML" class="text-center">
+        <form onSubmit="App.createProject(); return false;">
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              placeholder="Enter name"
+              name="name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="desc">Desc:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="desc"
+              placeholder="Enter desc"
+              name="desc"
+            />
+          </div>
+          <div class="form-group">
+            <label for="limit">limit:</label>
+            <input
+              type="number"
+              class="form-control"
+              id="limit"
+              placeholder="Enter value"
+              name="limit"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+      </div>
+
+      <div id="viewAllProjectsHTML">
+        <ul id="allProjects" class="list-unstyled text-center">
+          <div class="allProjectsTemplate" style="display: none;">
+            <label>
+              <div>View All Projects</div>
+              <div class="pName">Task content goes here...</div>
+              <div class="pDesc">Task Number goes here...</div>
+              <div class="pLimit">Task Number goes here...</div>
+              <div class="pAdmin">Task Number goes here...</div>
+            </label>
+          </div>
+        </ul>
+      </div>
+
+      <div id="viewMyProjectsHTML">
+        <ul id="myProjects" class="list-unstyled text-center">
+          <div class="myProjectsTemplate" style="display: none;">
+            <label>
+              <div>View My Project</div>
+              <div class="pName">Task content goes here...</div>
+              <div class="pDesc">Task Number goes here...</div>
+              <div class="pLimit">Task Number goes here...</div>
+              <div class="pAdmin">Task Number goes here...</div>
+              <div class="pDonatedVal">Task Number goes here...</div>
+              <div class="pBal">Task Number goes here...</div>
+            </label>
+          </div>
+        </ul>
+      </div>
+
+      <div id="viewAllAdminsHTML">
+        <ul id="allAdmins" class="list-unstyled text-center">
+          <div class="allAdminsTemplate">
+            <label>
+              <div>ALL ADMINS</div>
+              <div class="adminAddr">Task content goes here...</div>
+            </label>
+          </div>
+        </ul>
+      </div>
+
+      <div id="withdrawFromProjectHTML">
+        <div>WITHDRAW</div>
+        <form onSubmit="App.withdrawNow(); return false;">
+          <div class="form-group">
+            <label for="projID">Project ID:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="projID"
+              placeholder="Enter ID"
+              name="projID"
+            />
+          </div>
+          <div class="form-group">
+            <label for="amount">amount:</label>
+            <input
+              type="number"
+              class="form-control"
+              id="amount"
+              placeholder="Enter value"
+              name="amount"
+            />
+          </div>
+          <div class="form-group">
+            <label for="Reason">Reason:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="Reason"
+              placeholder="Enter Reason"
+              name="Reason"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+      </div>
+
+      <div id="viewAllTransactionsHTML">
+        <ul id="allTransactions" class="list-unstyled text-center">
+          <div class="viewAllTransactionsTemplate">
+            <label>
+              <div>ALL Transaction</div>
+              <div class="transaction">Task content goes here...</div>
+            </label>
+          </div>
+        </ul>
+      </div>
+
+      <div id="viewReputationHTML">
+        <ul id="viewReputation" class="list-unstyled text-center">
+          <div class="viewReputationTemplate">
+            <label>
+              <div>Reputation</div>
+              <div class="Reputation">Task content goes here...</div>
+            </label>
+          </div>
+        </ul>
+      </div>
+
+      <div id="homeHTML">
+        <div class="text-center">
+          THIS IS YOUR HOMEPAGE
+        </div>
+      </div>
+
+      <div id="submitProofHTML">
+        <div>SUBMIT PROOF</div>
+        <form onSubmit="App.submitProof(); return false;">
+          <div class="form-group">
+            <label for="name">TransactionID:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="TransactionID"
+              placeholder="Enter id"
+              name="TransactionID"
+            />
+          </div>
+          <div class="form-group">
+            <label for="link">link</label>
+            <input
+              type="number"
+              class="form-control"
+              id="link"
+              placeholder="Enter link"
+              name="link"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="MODERATOR">
+      <!-- SIDEBAR -->
+      <div id="mySidenav1" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav1()">
+          &times;
+        </a>
+        <a onclick="App.goToModHome()">Home</a>
+        <a onclick="App.goToValidateTransaction()">Validate Transactions</a>
+        <a onclick="App.goToViewModTokens()">View My Mod Tokens</a>
+      </div>
+      <script>
+        function openNav1() {
+          document.getElementById('mySidenav1').style.width = '250px'
+          console.log("mod nav open")
+        }
+
+        function closeNav1() {
+          document.getElementById('mySidenav1').style.width = '0'
+          console.log("mod nav close")
+        }
+      </script>
+
+      <div>
+        <span style="font-size: 30px; cursor: pointer;" onclick="openNav1()">
+          &#9776;
+        </span>
+      </div>
+      <!-- SIDEBAR -->
+
+      <div id="modHomeHTML" class="text-center">THIS IS MOD HOME</div>
+      <div id="validateTransactionHTML">
+        <ul id="validateTransaction" class="list-unstyled text-center">
+          <div class="validateTransactionTemplate" >
+            <label>
+              <div>Validate Transaction</div>
+              <div class="purpose">Task content goes here...</div>
+              <div class="value">Task Number goes here...</div>
+              <div class="proofLink">Task Number goes here...</div>
+              <div class="admin">Task Number goes here...</div>
+              <div class="projIndex">Task Number goes here...</div>
+              <div class="transactionIndex">Task Number goes here...</div>
+              <form onSubmit="App.modValidateTransaction(); return false;">
+              </form>
+            </label>
+          </div>
+        </ul>
+      </div>
+      <div id="viewModTokenHTML" class="text-center">
+        <div>BALANCE HERE</div>
+      </div>
+    </div>
+
+    <div id="DONOR">
+      <!-- SIDEBAR -->
+      <div id="mySidenav2" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">
+          &times;
+        </a>
+        <a onclick="App.goToDonorHome()">Home</a>
+        <a onclick="App.goToViewAllProjectsDonor()">Viw All Projects</a> 
+        <a onclick="App.goToViewAllAdminsDonor()">View Admins</a>
+        <a onclick="App.goToDonate()">Donate</a>
+        <a onclick="App.goToViewTransactionsDonor()">View Transaction</a>
+      </div>
+      <script>
+        function openNav2() {
+          document.getElementById('mySidenav2').style.width = '250px'
+        }
+
+        function closeNav2() {
+          document.getElementById('mySidenav2').style.width = '0'
+        }
+      </script>
+
+      <div>
+        <span style="font-size: 30px; cursor: pointer;" onclick="openNav2()">
+          &#9776;
+        </span>
+      </div>
+      <!-- SIDEBAR -->
+      <div id="donorHomeHTML" class="text-center">THIS IS DONOR HOME</div>
+      <div id="donateHTML">DONATION HERE</div>
+      <div id="viewAllProjectDonorHTML">All projects here</div>
+      <div id="viewAllAdminsDonorHTML">AllAdmins</div>
+      <div id="viewAllTransactionsDonorHTML">All Transactions</div>
+      
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
