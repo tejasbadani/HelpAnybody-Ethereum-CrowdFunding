@@ -1,6 +1,6 @@
 pragma solidity >=0.4.22 <0.7.0;
 pragma experimental ABIEncoderV2;
-import './ReputationToken.sol';
+import 'ReputationToken.sol';
 contract ProjectCreator{
     
     struct Project{
@@ -13,6 +13,7 @@ contract ProjectCreator{
         mapping ( uint=> Transaction) transactions;
         uint transactionSize;
         uint spentAmount;
+        uint index;
     }
     struct Transaction{
         Project p;
@@ -35,7 +36,6 @@ contract ProjectCreator{
     uint256 last = 0;
     mapping (address => bool) adminCheck;
     address[] internal keyList;
-    uint public adminCount = 0;
     mapping (address => uint) overallTransactionCount;
 
  
@@ -50,7 +50,7 @@ contract ProjectCreator{
         uint repTokensBalance = rep.balanceOf(msg.sender);
         uint ratio = transactionCount/repTokensBalance;
         require(ratio <=2,"Reputation too low to create a project!");
-        p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0});
+        p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0, index: projectCount[msg.sender]});
         // p = Project(_name,_desc,_value,msg.sender,0,_value,transactions[-1] = t,0);
         projects[msg.sender].push(p);
         projectList[pCount]=p;
@@ -58,7 +58,6 @@ contract ProjectCreator{
         if(adminCheck[msg.sender] == false){
             adminCheck[msg.sender] = true;
             keyList.push(msg.sender);
-            adminCount ++;
         }
         projectCount[msg.sender]++;
         pCount++;
