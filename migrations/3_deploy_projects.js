@@ -3,7 +3,6 @@ const ModeratorToken = artifacts.require("ModeratorToken");
 const ProjectCreator = artifacts.require("ProjectCreator");
 const Moderator = artifacts.require("Moderator");
 const Donor = artifacts.require("Donor");
-
 module.exports = function(deployer) {
   deployer.then(async () => {
   
@@ -18,6 +17,9 @@ module.exports = function(deployer) {
 
     const modInst = await deployer.deploy(Moderator, modTokenInst.address, repTokenInst.address, projInst.address);
     console.log('Moderator contract deployed at', modInst.address);
+
+    await repTokenInst.approveContract(modInst.address,100000);
+    await modTokenInst.approveContract(modInst.address,100000);
 
     const donorInst = await deployer.deploy(Donor, projInst.address);
     console.log('Donor contract deployed at', donorInst.address);
