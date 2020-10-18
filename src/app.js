@@ -92,6 +92,7 @@ App = {
   loadAccount: async () => {
     // Set the current blockchain account
     App.account = web3.eth.accounts[0]
+    console.log(App.account)
   },
 
   loadContract: async () => {
@@ -133,15 +134,21 @@ App = {
     App.setLoading(1)
 
     // Render Account
-    $('#account').html(App.account)
+    console.log(App.account)
 
 
     //Render All ProjectCreator
     await App.renderMyProjects()
+    await App.renderAllProjects()
+    await App.renderAllAdmins()
+    await App.renderReputationBalance()
 
     //Render All Moderator
-    await App.returnModTokenBalance()
+    await App.renderModTokenBalance()
+
     //Render All Donor
+    await App.renderAllProjectsDonor()
+    await App.renderAllAdminsDonor()
 
     // Update loading state
     if(App.mainState === 0){
@@ -183,20 +190,10 @@ SET_MODERATOR: async () => {
 SET_DONOR: async () => {
   console.log('selected SET_DONOR')
   App.mainState = 3
-  App.setLoading(304)
+  App.setLoading(305)
 },
 // END OF MAIN PAGE FUNCTIONS
 
-//MODERATOR FUNCTIONS
-
-  returnModTokenBalance: async () => {
-    const $viewModTokenBalance = $('#viewModTokenHTML');
-    const value = await App.M.viewModeratorTokenBalance.call();
-    console.log("HELLO THERE",value.toNumber());
-    $('#balanceMod').html(value.toNumber());
-    // $viewModTokenBalance.find('modbalance').html(value)
-    // $viewModTokenBalance.show()
-  },
 
 
 
@@ -214,11 +211,6 @@ SET_DONOR: async () => {
 
 // PROJECT CREATOR FUNCTIONS
 
-  findAdminIndexWithOverallIndex: async () => {
-
-  },
-
-
   renderAllProjects: async () => {
     // Load the total task count from the blockchain
     const PCCount = await App.PC.pCount()
@@ -227,7 +219,18 @@ SET_DONOR: async () => {
     // Render out each task with a new task template
     for (var i = 0; i < PCCount; i++) {
       // Fetch the task data from the blockchain
-      const proj = await App.PC.projectList(i)
+      const indexMap = await App.PC.projectMap(i)
+      //console.log(indexMap)
+      const projAdmin = indexMap[0]
+      const projAdminIndex = indexMap[1].toNumber()
+      //console.log(projAdmin)
+      //console.log(projAdminIndex)
+
+      // Fetch the task data from the blockchain
+      //console.log("GONNA FETCH")
+      const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
+      //console.log("FETCHED PROJ")
+      //console.log(proj)
       const name = proj[0]
       const desc = proj[1]
       const limit = proj[2].toNumber()
@@ -237,6 +240,7 @@ SET_DONOR: async () => {
 
       // Create the html for the task
       const $newAllProjectsTemplate = $allProjectsTemplate.clone()
+      $newAllProjectsTemplate.find('.pID').html(i)
       $newAllProjectsTemplate.find('.pName').html(name)
       $newAllProjectsTemplate.find('.pDesc').html(desc)
       $newAllProjectsTemplate.find('.pLimit').html(limit)
@@ -252,27 +256,47 @@ SET_DONOR: async () => {
     // Load the total task count from the blockchain
     const PCCount = await App.PC.pCount()
     const $myProjectsTemplate = $('.myProjectsTemplate')
+    //console.log("pCount")
+    //console.log(PCCount)
 
     // Render out each task with a new task template
     for (var i = 0; i < PCCount; i++) {
       // Fetch the task data from the blockchain
-      const proj = await App.PC.projectList(i)
-      console.log(proj)
+      const indexMap = await App.PC.projectMap(i)
+      //console.log(indexMap)
+      const projAdmin = indexMap[0]
+      const projAdminIndex = indexMap[1].toNumber()
+      //console.log(projAdmin)
+      //console.log(projAdminIndex)
+
+      // Fetch the task data from the blockchain
+      //console.log("GONNA FETCH")
+      const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
+      //console.log("FETCHED PROJ")
+      //console.log(proj)
       const name = proj[0]
       const desc = proj[1]
       const limit = proj[2].toNumber()
       const admin = proj[3]
       const donatedVal = proj[4].toNumber()
       const bal = proj[5].toNumber()
+      const NOT = proj[6].toNumber()
+      const spent = proj[7].toNumber()
+      const adminIndex = proj[8].toNumber()
+
       if (admin === App.account) {
         // Create the html for the task
         const $newMyProjectsTemplate = $myProjectsTemplate.clone()
+        $newMyProjectsTemplate.find('.pID').html(i)
         $newMyProjectsTemplate.find('.pName').html(name)
         $newMyProjectsTemplate.find('.pDesc').html(desc)
         $newMyProjectsTemplate.find('.pLimit').html(limit)
         $newMyProjectsTemplate.find('.pAdmin').html(admin)
         $newMyProjectsTemplate.find('.pDonatedVal').html(donatedVal)
         $newMyProjectsTemplate.find('.pBal').html(bal)
+        $newMyProjectsTemplate.find('.pNOT').html(NOT)
+        $newMyProjectsTemplate.find('.pSpent').html(spent)
+        $newMyProjectsTemplate.find('.pAdminIndex').html(adminIndex)
 
         $('#myProjects').append($newMyProjectsTemplate)
 
@@ -280,24 +304,124 @@ SET_DONOR: async () => {
       }
     }
   },
+  renderAllAdmins: async () => {
+    // Load the total task count from the blockchain
+    const AdminCount = await App.PC.adminCount()
+    const $allAdminsTemplate = $('.allAdminsTemplate')
+    //console.log("ADMIN COUNT BELOW")
+    //console.log(AdminCount)
+    // Render out each task with a new task template
+    for (var i = 0; i < AdminCount; i++) {
+      // Fetch the task data from the blockchain
+      const admin = await App.PC.keyList(i)
+      //console.log("admin here")
+      //console.log(admin)
 
+      // Create the html for the task
+      const $newAllAdminsTemplate = $allAdminsTemplate.clone()
+      $newAllAdminsTemplate.find('.adminAddr').html(admin)
+
+      $('#allAdmins').append($newAllAdminsTemplate)
+
+      $newAllAdminsTemplate.show()
+    }
+  },
 
   createProject: async () => {
     App.setLoading(110)
     const name = $('#name').val()
     const desc = $('#desc').val()
     const limit = $('#limit').val()
+    console.log("I AM HERE NOW")
     await App.PC.createProject(name, desc, limit)
     window.location.reload()
   },
 
-  withdrawNow: async () => {
-    const ID = $('#projID').val()
-    const amount = $('#amount').val()
+  withdrawFromProject: async () => {
+    const globalIndex = $('#projID').val()
+    const amount1 = $('#amount').val()
+    const amount = amount1 * ((10)**18)
     const reason = $('#Reason').val()
-    await App.PC.withdrawNow(amount,ID,reason)
+    const indexMap = await App.PC.projectMap(globalIndex)
+    console.log(indexMap)
+    const projAdmin = indexMap[0]
+    const projAdminIndex = indexMap[1].toNumber()
+    const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
+    console.log(proj)
+
+    console.log("gonna Withdraw now")
+    x = await App.PC.withdraw(amount, projAdminIndex,reason)
+    console.log(x)
   },
 
+  renderReputationBalance: async () => {
+    const bal1 = await App.PC.reputationTokenBalance.call()
+    console.log("BALANCE")
+    const bal = bal1.toNumber()
+    console.log(bal)
+    const $reputationTemplate = $('.reputationTemplate')
+    const $newReputationTemplate = $reputationTemplate.clone()
+    $newReputationTemplate.find('.repBal').html(bal)
+    $('#reputation').append($newReputationTemplate)
+    $newReputationTemplate.show()
+  },
+
+  transactionsOfProject: async () => {
+    const globalIndex = $('#projID1').val()
+    const indexMap = await App.PC.projectMap(globalIndex)
+    console.log("BEGINNING TRANSACTION RENDER")
+    
+    const projAdmin = indexMap[0]
+    const projAdminIndex = indexMap[1].toNumber()
+    //console.log(projAdmin)
+    //console.log(projAdminIndex)
+    const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
+    //console.log(proj)
+    const $viewAllTransactionsTemplate = $('.viewAllTransactionsTemplate')
+    const tsize = proj[6].toNumber()
+    for (var i = 0; i < tsize; i++) {
+      
+      const transaction = await App.PC.viewSingleTransaction.call(projAdmin,projAdminIndex,i)
+      console.log(transaction)
+      const purpose = transaction[0]
+      const value = transaction[1]
+      const proofLink = transaction[2]
+      const verified = transaction[3]
+      
+
+      // Create the html for the task
+      
+      const $newViewAllTransactionsTemplate = $viewAllTransactionsTemplate.clone()
+      $newViewAllTransactionsTemplate.find('.globalIndexTransaction').html(globalIndex)
+      $newViewAllTransactionsTemplate.find('.adminTransaction').html(projAdmin)
+      $newViewAllTransactionsTemplate.find('.adminProjIndexTransaction').html(projAdminIndex)
+      $newViewAllTransactionsTemplate.find('.TransactionIndex').html(i)
+      $newViewAllTransactionsTemplate.find('.purposeTransaction').html(purpose)
+      $newViewAllTransactionsTemplate.find('.valueTransaction').html(value)
+      $newViewAllTransactionsTemplate.find('.linkTransaction').html(proofLink)
+      $newViewAllTransactionsTemplate.find('.verifiedTransaction').html(verified)
+
+      $('#allTransactions').append($newViewAllTransactionsTemplate)
+
+      $newViewAllTransactionsTemplate.show()
+    }
+  },
+
+  submitProof: async () => {
+    const globalIndex = $('#globalIndex').val()
+    const tindex = $('#TransactionIndex').val()
+    const link = $('#link').val()
+    console.log("SUBMITTING PROOF")
+    const indexMap = await App.PC.projectMap(globalIndex)
+    const projAdmin = indexMap[0]
+    const projAdminIndex = indexMap[1].toNumber()
+    console.log(link)
+    console.log(projAdmin)
+    console.log(projAdminIndex)
+    console.log(tindex)
+    await App.PC.submitProof(link,projAdmin,projAdminIndex,tindex)
+  },
+// TRANSFERRING FUNCTIONS
   goToCreate: async () => {
     console.log('selected goToCreate')
     App.setLoading(102)
@@ -359,6 +483,59 @@ SET_DONOR: async () => {
 
 
   // MODERATOR FUNCTIONS
+  renderModTokenBalance: async () => {
+    const $viewModTokenBalance = $('#viewModTokenHTML');
+    const value = await App.M.viewModeratorTokenBalance.call();
+    $('#balanceMod').html(value.toNumber());
+  },
+
+  
+  genRandomTransactionMod: async () => {
+    console.log("GEN RAND TRANSACTION")
+    const randT = await App.PC.requestedRandomTransactionFromMod.call()
+    console.log(randT)
+
+    const purposeTransaction = randT[0]
+    const valueTransaction = randT[1].toNumber()
+    const proofLinkTransaction = randT[2]
+    const adminTransaction = randT[3]
+    const indexTransaction = randT[4].toNumber()
+    const verifiedTransaction = randT[5]
+    const tindexTransaction = randT[6].toNumber()
+
+    const $validateTransactionTemplate = $('.validateTransactionTemplate')
+
+    // Create the html for the task
+      
+    const $newValidateTransactionTemplate = $validateTransactionTemplate.clone()
+    $newValidateTransactionTemplate.find('.purposeTransactionValidate').html(purposeTransaction)
+    $newValidateTransactionTemplate.find('.valueTransactionValidate').html(valueTransaction)
+    $newValidateTransactionTemplate.find('.proofLinkTransactionValidate').html(proofLinkTransaction)
+    $newValidateTransactionTemplate.find('.adminTransactionValidate').html(adminTransaction)
+    $newValidateTransactionTemplate.find('.projIndexTransactionValidate').html(indexTransaction)
+    $newValidateTransactionTemplate.find('.transactionIndexTransactionValidate').html(tindexTransaction)
+
+    $('#validateTransaction').append($newValidateTransactionTemplate)
+
+    $newValidateTransactionTemplate.show()
+    console.log("WISH ME LUCK")
+    await App.M.generateRandomTransactionFromEmit(purposeTransaction, valueTransaction, proofLinkTransaction, adminTransaction, indexTransaction,verifiedTransaction,tindexTransaction)
+  },
+
+  modValidateTransaction: async () => {
+    const answer = $('#answerMod').val()
+    console.log("GONNA VALIDATE")
+    console.log(answer)
+    if(answer == 1){
+      await App.M.validateTransaction()
+      console.log("VALIDATED")
+    }
+    else if(answer == 0){
+      await App.M.rejectTransaction()
+      console.log("REJECTED")
+    }
+  },
+  //Transfer Functions
   goToModHome: async () => {
     console.log('selected goToModHome')
     App.setLoading(203)
@@ -389,6 +566,147 @@ SET_DONOR: async () => {
 
 
   // DONOR FUNCS
+  renderAllProjectsDonor: async () => {
+    // Load the total task count from the blockchain
+    const PCCount = await App.PC.pCount()
+    const $allProjectsDonorTemplate = $('.allProjectsDonorTemplate')
+
+    // Render out each task with a new task template
+    for (var i = 0; i < PCCount; i++) {
+      // Fetch the task data from the blockchain
+      const indexMap = await App.PC.projectMap(i)
+      //console.log(indexMap)
+      const projAdmin = indexMap[0]
+      const projAdminIndex = indexMap[1].toNumber()
+      //console.log(projAdmin)
+      //console.log(projAdminIndex)
+
+      // Fetch the task data from the blockchain
+      //console.log("GONNA FETCH")
+      const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
+      //console.log("FETCHED PROJ")
+      //console.log(proj)
+      const name = proj[0]
+      const desc = proj[1]
+      const limit = proj[2].toNumber()
+      const admin = proj[3]
+      const donatedVal = proj[4].toNumber()
+      const bal = proj[5].toNumber()
+      const NOT = proj[6].toNumber()
+      const spent = proj[7].toNumber()
+      const adminIndex = proj[8].toNumber()
+
+      // Create the html for the task
+      const $newAllProjectsDonorTemplate = $allProjectsDonorTemplate.clone()
+      $newAllProjectsDonorTemplate.find('.pID').html(i)
+      $newAllProjectsDonorTemplate.find('.pName').html(name)
+      $newAllProjectsDonorTemplate.find('.pDesc').html(desc)
+      $newAllProjectsDonorTemplate.find('.pLimit').html(limit)
+      $newAllProjectsDonorTemplate.find('.pAdmin').html(admin)
+      $newAllProjectsDonorTemplate.find('.pDonatedVal').html(donatedVal)
+      $newAllProjectsDonorTemplate.find('.pBal').html(bal)
+      $newAllProjectsDonorTemplate.find('.pNOT').html(NOT)
+      $newAllProjectsDonorTemplate.find('.pSpent').html(spent)
+      $newAllProjectsDonorTemplate.find('.pAdminIndex').html(adminIndex)
+
+      $('#allProjectsDonor').append($newAllProjectsDonorTemplate)
+
+      $newAllProjectsDonorTemplate.show()
+    }
+  },
+
+  renderAllAdminsDonor: async () => {
+    // Load the total task count from the blockchain
+    const AdminCount = await App.PC.adminCount()
+    const $allAdminsDonorTemplate = $('.allAdminsDonorTemplate')
+    //console.log("ADMIN COUNT BELOW")
+    //console.log(AdminCount)
+    // Render out each task with a new task template
+    for (var i = 0; i < AdminCount; i++) {
+      // Fetch the task data from the blockchain
+      const admin = await App.PC.keyList(i)
+      //console.log("admin here")
+      //console.log(admin)
+
+      // Create the html for the task
+      const $newAllAdminsDonorTemplate = $allAdminsDonorTemplate.clone()
+      $newAllAdminsDonorTemplate.find('.adminAddr').html(admin)
+
+      $('#allAdminsDonor').append($newAllAdminsDonorTemplate)
+
+      $newAllAdminsDonorTemplate.show()
+    }
+  },
+
+  donateToProject: async () => {
+    const mainIndex = $('#mainIndex').val()
+    const amount = $('#value').val()
+    const indexMap = await App.PC.projectMap(mainIndex)
+    console.log(indexMap)
+    const admin = indexMap[0]
+    const adminIndex = indexMap[1].toNumber()
+    const msg ="hi"
+    console.log("ALL SET TO GO")
+    console.log(amount)
+    console.log(admin)
+    console.log(adminIndex)
+    await App.D.donate(amount,admin,adminIndex,"Hi")
+    console.log("DONATED IN FUNC")
+    console.log("BEGINNING ACTUAL MONEY TRANSFER")
+    web3.eth.sendTransaction({
+      from: App.account,
+      to: App.PC.address,
+      value: amount * ((10)**18)
+    }, function(error,hash){
+      console.log(error)
+    })
+    const balanceNow = await App.PC.showBalance.call()
+    console.log("BALANCE BEFORE TRANSFER")
+    console.log(balanceNow.toNumber())
+    //window.location.reload()
+  },
+
+  transactionsOfProjectDonor: async () => {
+    const globalIndex = $('#projID1').val()
+    const indexMap = await App.PC.projectMap(globalIndex)
+    console.log("BEGINNING TRANSACTION RENDER")
+    
+    const projAdmin = indexMap[0]
+    const projAdminIndex = indexMap[1].toNumber()
+    //console.log(projAdmin)
+    //console.log(projAdminIndex)
+    const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
+    //console.log(proj)
+    const $viewAllTransactionsTemplate = $('.viewAllTransactionsTemplateDonor')
+    const tsize = proj[6].toNumber()
+    for (var i = 0; i < tsize; i++) {
+      
+      const transaction = await App.PC.viewSingleTransaction.call(projAdmin,projAdminIndex,i)
+      console.log(transaction)
+      const purpose = transaction[0]
+      const value = transaction[1]
+      const proofLink = transaction[2]
+      const verified = transaction[3]
+      
+
+      // Create the html for the task
+      
+      const $newViewAllTransactionsTemplateDonor = $viewAllTransactionsTemplateDonor.clone()
+      $newViewAllTransactionsTemplateDonor.find('.globalIndexTransactionDonor').html(globalIndex)
+      $newViewAllTransactionsTemplateDonor.find('.adminTransactionDonor').html(projAdmin)
+      $newViewAllTransactionsTemplateDonor.find('.adminProjIndexTransactionDonor').html(projAdminIndex)
+      $newViewAllTransactionsTemplateDonor.find('.TransactionIndexDonor').html(i)
+      $newViewAllTransactionsTemplateDonor.find('.purposeTransactionDonor').html(purpose)
+      $newViewAllTransactionsTemplateDonor.find('.valueTransactionDonor').html(value)
+      $newViewAllTransactionsTemplateDonor.find('.linkTransactionDonor').html(proofLink)
+      $newViewAllTransactionsTemplateDonor.find('.verifiedTransactionDonor').html(verified)
+
+      $('#allTransactionsDonor').append($newViewAllTransactionsTemplateDonor)
+
+      $newViewAllTransactionsTemplateDonor.show()
+    }
+  },
+  //ROUTING FUNCS
   goToDonorHome: async () => {
     console.log('selected goToDonorHome')
     App.setLoading(305)
@@ -431,6 +749,8 @@ SET_DONOR: async () => {
 
 
   setLoading: (stateNum) => {
+    console.log("MOVING TO STATE")
+    console.log(stateNum)
     if(App.mainState === 0){
       document.getElementById('MAIN-PAGE').hidden = false
       document.getElementById('PROJECT-CREATOR').hidden = true
@@ -501,14 +821,14 @@ SET_DONOR: async () => {
       document.getElementById('MODERATOR').hidden = true
       document.getElementById('DONOR').hidden = false
       
-      document.getElementById('viewAllProjectDonorHTML').hidden = true
+      document.getElementById('allProjectDonorHTML').hidden = true
       document.getElementById('donateHTML').hidden = true
       document.getElementById('viewAllTransactionsDonorHTML').hidden = true
       document.getElementById('viewAllAdminsDonorHTML').hidden = true
       document.getElementById('donorHomeHTML').hidden = true
 
       if (stateNum == 301) {
-        document.getElementById('viewAllProjectDonorHTML').hidden = false
+        document.getElementById('allProjectDonorHTML').hidden = false
       } else if (stateNum == 302) {
         document.getElementById('donateHTML').hidden = false
       } else if (stateNum == 303) {

@@ -90,6 +90,7 @@
         function openNav() {
           document.getElementById('mySidenav').style.width = '250px'
         }
+
         function closeNav() {
           document.getElementById('mySidenav').style.width = '0'
         }
@@ -144,41 +145,46 @@
       </div>
 
       <div id="viewAllProjectsHTML">
+        <div class="text-center">View All Projects</div>
         <ul id="allProjects" class="list-unstyled text-center">
-          <div class="allProjectsTemplate" style="display: none;">
+          <div class="allProjectsTemplate" style="border-style: solid;">
             <label>
-              <div>View All Projects</div>
-              <div class="pName">Task content goes here...</div>
-              <div class="pDesc">Task Number goes here...</div>
-              <div class="pLimit">Task Number goes here...</div>
-              <div class="pAdmin">Task Number goes here...</div>
+              <div class="pID">Task ID</div>
+              <div class="pName">Name</div>
+              <div class="pDesc">Description</div>
+              <div class="pLimit">Limit</div>
+              <div class="pAdmin">Admin</div>
             </label>
           </div>
         </ul>
       </div>
 
       <div id="viewMyProjectsHTML">
+        <div class="text-center">View My Project</div>
         <ul id="myProjects" class="list-unstyled text-center">
-          <div class="myProjectsTemplate" style="display: none;">
+          <div class="myProjectsTemplate" style="border-style: solid;">
             <label>
-              <div>View My Project</div>
-              <div class="pName">Task content goes here...</div>
-              <div class="pDesc">Task Number goes here...</div>
-              <div class="pLimit">Task Number goes here...</div>
-              <div class="pAdmin">Task Number goes here...</div>
-              <div class="pDonatedVal">Task Number goes here...</div>
-              <div class="pBal">Task Number goes here...</div>
+              <div class="pID">Task ID</div>
+              <div class="pName">Name</div>
+              <div class="pDesc">Description</div>
+              <div class="pLimit">Limit</div>
+              <div class="pAdmin">Admin</div>
+              <div class="pDonatedVal">Donated Val</div>
+              <div class="pBal">Remaining to raise</div>
+              <div class="pNOT">Num of Transaction</div>
+              <div class="pAdminIndex">Admin Index</div>
+              <div class="pSpent">Spent</div>
             </label>
           </div>
         </ul>
       </div>
 
       <div id="viewAllAdminsHTML">
+        <div class="="text-center>ALL ADMINS</div>
         <ul id="allAdmins" class="list-unstyled text-center">
-          <div class="allAdminsTemplate">
+          <div class="allAdminsTemplate" style="border-style: solid;">
             <label>
-              <div>ALL ADMINS</div>
-              <div class="adminAddr">Task content goes here...</div>
+              <div class="adminAddr">Project Creator Addresses</div>
             </label>
           </div>
         </ul>
@@ -186,7 +192,7 @@
 
       <div id="withdrawFromProjectHTML">
         <div>WITHDRAW</div>
-        <form onSubmit="App.withdrawNow(); return false;">
+        <form onSubmit="App.withdrawFromProject(); return false;">
           <div class="form-group">
             <label for="projID">Project ID:</label>
             <input
@@ -223,22 +229,42 @@
       </div>
 
       <div id="viewAllTransactionsHTML">
+        <div>TRANSACTIONS OF A PROJECT</div>
+        <form onSubmit="App.transactionsOfProject(); return false;">
+          <div class="form-group">
+            <label for="globalIndex">Index:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="projID1"
+              placeholder="Enter ID"
+              name="projID"
+            />
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <div>ALL Transaction</div>
         <ul id="allTransactions" class="list-unstyled text-center">
-          <div class="viewAllTransactionsTemplate">
+          <div class="viewAllTransactionsTemplate" style="border-style: solid;">
             <label>
-              <div>ALL Transaction</div>
-              <div class="transaction">Task content goes here...</div>
+              <div class="globalIndexTransaction">Global Index</div>
+              <div class="adminTransaction">Admin</div>
+              <div class="adminProjIndexTransaction">Admin Project Index</div>
+              <div class="TransactionIndex">TransactionIndex</div>
+              <div class="purposeTransaction">purpose</div>
+              <div class="valueTransaction">value</div>
+              <div class="linkTransaction">Proof Link</div>
+              <div class="verifiedTransaction">verified</div>
             </label>
           </div>
         </ul>
       </div>
 
       <div id="viewReputationHTML">
-        <ul id="viewReputation" class="list-unstyled text-center">
-          <div class="viewReputationTemplate">
+        <ul id="reputation" class="list-unstyled text-center">
+          <div class="reputationTemplate" style="border-style: solid;">
             <label>
-              <div>Reputation</div>
-              <div class="Reputation">Task content goes here...</div>
+              <div class="repBal">Reputation Tokens Held</div>
             </label>
           </div>
         </ul>
@@ -254,19 +280,29 @@
         <div>SUBMIT PROOF</div>
         <form onSubmit="App.submitProof(); return false;">
           <div class="form-group">
-            <label for="name">TransactionID:</label>
+            <label for="name">global Index:</label>
             <input
-              type="text"
+              type="number"
               class="form-control"
-              id="TransactionID"
+              id="globalIndex"
+              placeholder="Enter Index"
+              name="globalIndex"
+            />
+          </div>
+          <div class="form-group">
+            <label for="name">TransactionIndex:</label>
+            <input
+              type="number"
+              class="form-control"
+              id="TransactionIndex"
               placeholder="Enter id"
-              name="TransactionID"
+              name="TransactionIndex"
             />
           </div>
           <div class="form-group">
             <label for="link">link</label>
             <input
-              type="number"
+              type="text"
               class="form-control"
               id="link"
               placeholder="Enter link"
@@ -310,21 +346,35 @@
 
       <div id="modHomeHTML" class="text-center">THIS IS MOD HOME</div>
       <div id="validateTransactionHTML">
+        <form onSubmit="App.genRandomTransactionMod(); return false;">
+          <button type="submit" class="btn btn-default">Give me a transaction to validate</button>
+        </form>
         <ul id="validateTransaction" class="list-unstyled text-center">
           <div class="validateTransactionTemplate" >
             <label>
-              <div>Validate Transaction</div>
-              <div class="purpose">Task content goes here...</div>
-              <div class="value">Task Number goes here...</div>
-              <div class="proofLink">Task Number goes here...</div>
-              <div class="admin">Task Number goes here...</div>
-              <div class="projIndex">Task Number goes here...</div>
-              <div class="transactionIndex">Task Number goes here...</div>
-              <form onSubmit="App.modValidateTransaction(); return false;">
-              </form>
+              <div>Validate The Transaction</div>
+              <div class="purposeTransactionValidate">purpose</div>
+              <div class="valueTransactionValidate">value</div>
+              <div class="proofLinkTransactionValidate">proof link</div>
+              <div class="adminTransactionValidate">admin</div>
+              <div class="projIndexTransactionValidate">project Local Index</div>
+              <div class="transactionIndexTransactionValidate">Transaction Index</div>
             </label>
           </div>
         </ul>
+        <form onSubmit="App.modValidateTransaction(); return false;">
+          <div class="form-group">
+            <label for="answerMod">1=yes,0=no</label>
+            <input
+              type="number"
+              class="form-control"
+              id="answerMod"
+              placeholder="Enter ID"
+              name="projID"
+            />
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
       </div>
       <div id="viewModTokenHTML" class="text-center">
         <div >Your Moderator Token Balance is</div>
@@ -361,10 +411,92 @@
       </div>
       <!-- SIDEBAR -->
       <div id="donorHomeHTML" class="text-center">THIS IS DONOR HOME</div>
-      <div id="donateHTML">DONATION HERE</div>
-      <div id="viewAllProjectDonorHTML">All projects here</div>
-      <div id="viewAllAdminsDonorHTML">AllAdmins</div>
-      <div id="viewAllTransactionsDonorHTML">All Transactions</div>
+      <div id="donateHTML">
+        <form onSubmit="App.donateToProject(); return false;">
+          <div class="form-group">
+            <label for="mainIndex">Project Index:</label>
+            <input
+              type="number"
+              class="form-control"
+              id="mainIndex"
+              placeholder="Enter Index"
+              name="mainIndex"
+            />
+          </div>
+          <div class="form-group">
+            <label for="value">value:</label>
+            <input
+              type="number"
+              class="form-control"
+              id="value"
+              placeholder="Enter value"
+              name="value"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+      </div>
+      <div id="allProjectDonorHTML">
+        <div class="text-center">View All Projects</div>
+        <ul id="allProjectsDonor" class="list-unstyled text-center">
+          <div class="allProjectsDonorTemplate" style="border-style: solid;">
+            <label>
+              <div class="pID">Task ID</div>
+              <div class="pName">Name</div>
+              <div class="pDesc">Description</div>
+              <div class="pLimit">Limit</div>
+              <div class="pAdmin">Admin</div>
+              <div class="pDonatedVal">Donated Val</div>
+              <div class="pBal">Remaining to raise</div>
+              <div class="pNOT">Num of Transaction</div>
+              <div class="pAdminIndex">Admin Index</div>
+              <div class="pSpent">Spent</div>
+            </label>
+          </div>
+        </ul>
+      </div>
+      <div id="viewAllAdminsDonorHTML">
+          <div class="="text-center>ALL ADMINS</div>
+          <ul id="allAdminsDonor" class="list-unstyled text-center">
+            <div class="allAdminsDonorTemplate" style="border-style: solid;">
+              <label>
+                <div class="adminAddr">Project Creator Addresses</div>
+              </label>
+            </div>
+          </ul>
+      </div>
+      <div id="viewAllTransactionsDonorHTML">
+        <div>TRANSACTIONS OF A PROJECT</div>
+        <form onSubmit="App.transactionsOfProjectDonor(); return false;">
+          <div class="form-group">
+            <label for="globalIndex">Index:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="projID1"
+              placeholder="Enter ID"
+              name="projID"
+            />
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+        <div>ALL Transaction</div>
+        <ul id="allTransactionsDonor" class="list-unstyled text-center">
+          <div class="viewAllTransactionsTemplateDonor" style="border-style: solid;">
+            <label>
+              <div class="globalIndexTransactionDonor">Global Index</div>
+              <div class="adminTransactionDonor">Admin</div>
+              <div class="adminProjIndexTransactionDonor">Admin Project Index</div>
+              <div class="TransactionIndexDonor">TransactionIndex</div>
+              <div class="purposeTransactionDonor">purpose</div>
+              <div class="valueTransactionDonor">value</div>
+              <div class="linkTransactionDonor">Proof Link</div>
+              <div class="verifiedTransactionDonor">verified</div>
+            </label>
+          </div>
+        </ul>
+      </div>
       
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
