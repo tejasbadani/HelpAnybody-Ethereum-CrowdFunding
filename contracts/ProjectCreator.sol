@@ -25,18 +25,21 @@ contract ProjectCreator{
         bool verified;
         uint transactionIndex;
     }
-    
+    struct gloablIndexToAdmin{
+        address admin;
+        uint adminIndex;
+    }
     ReputationToken rep;
     Project p;
     uint public pCount;
-    mapping (uint => Project) public projectList;
+    mapping (uint => globalIndexToAdmin) public projectMap;
     mapping (address => Project[]) public projects;
     mapping (address => uint) public projectCount;
     mapping(uint256 => Transaction) queue;
     uint256 first = 1;
     uint256 last = 0;
     mapping (address => bool) adminCheck;
-    address[] internal keyList;
+    address[] public keyList;
     uint public adminCount = 0;
     mapping (address => uint) overallTransactionCount;
 
@@ -44,9 +47,14 @@ contract ProjectCreator{
     constructor(address _repToken) public{
         rep = ReputationToken(_repToken);
     }
-
     function showBalance()public returns(uint){
         return address(this).balance;
+    }
+    receive() external payable{
+        //Emit transaction
+    }
+    fallback() external{
+        //Emit Cancellation
     }
     function createProject(string memory _name, string memory _desc, uint _value) public{
         //Ratio between transactionCount count and reputation matters here
@@ -59,7 +67,7 @@ contract ProjectCreator{
         p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0,index: projectCount[msg.sender]});
         // p = Project(_name,_desc,_value,msg.sender,0,_value,transactions[-1] = t,0);
         projects[msg.sender].push(p);
-        projectList[pCount]=p;
+        projectMap[pCount] = globalIndexToAdmin({admin: msg.sender, adminIndex: projectCount[msg.sender] });
         //Remove Duplicates
         if(adminCheck[msg.sender] == false){
             adminCheck[msg.sender] = true;
@@ -69,6 +77,7 @@ contract ProjectCreator{
         projectCount[msg.sender]++;
         pCount++;
     }
+    
     event ViewProject(string  name, string  desc,uint value,address admin);
     function viewProject(address owner,uint index) public returns(string memory name, string memory desc,uint value,address admin){
         Project memory pr = projects[owner][index];
@@ -128,13 +137,6 @@ contract ProjectCreator{
         delete queue[first];
         first += 1;
     }
-
-    receive() external payable{
-        //Emit transaction
-    }
-    fallback() external{
-        //Emit Cancellation
-    }
     function withdraw(uint amount, uint index,string memory purpose) public{
         //Withdraw based on reputation
         //Based on Ratio of transactionCount and reputation.
@@ -180,7 +182,7 @@ contract ProjectCreator{
         projects[admin][index].transactions[transactionIndex].verified = true;
     }
     event ViewAllTransactions(string[]  _purpose, uint[]  _value,string[]  _proofLink,address _admin,bool[] _verified, uint[]  _transactionIndex);
-      function viewAllTransactionsForProject(address admin, uint index)public{
+    function viewAllTransactionsForProject(address admin, uint index)public{
         uint length = projects[admin][index].transactionSize;
         string[] memory purpose = new string[](length);
         uint[] memory value = new uint[](length);
@@ -196,4 +198,5 @@ contract ProjectCreator{
         }
         emit ViewAllTransactions(purpose,value,proofLink,admin,verified,transactionIndex);
     }
+
 }
