@@ -2,7 +2,6 @@ pragma solidity >=0.4.22 <0.7.0;
 pragma experimental ABIEncoderV2;
 import './ReputationToken.sol';
 contract ProjectCreator{
-    
     struct Project{
         string name;
         string description;
@@ -42,7 +41,6 @@ contract ProjectCreator{
     address[] public keyList;
     uint public adminCount = 0;
     mapping (address => uint) overallTransactionCount;
-    uint public reputationTokenBalance;
 
  
     constructor(address _repToken) public{
@@ -54,24 +52,22 @@ contract ProjectCreator{
         return address(this).balance;
     }
     receive() external payable{
-        //Emit transaction
+        //Receive Ether
     }
     fallback() external{
-        //Emit Cancellation
+        //In case of an error in receiving ether
     }
     function createProject(string memory _name, string memory _desc, uint _value) public{
         //Ratio between transactionCount count and reputation matters here
         //If ratio is too low, no project creation
-
         uint transactionCount = overallTransactionCount[msg.sender];
-        //uint repTokensBalance = rep.balanceOf(msg.sender);
-        //if(repTokensBalance == 0){
-        //    repTokensBalance = 1;
-        //}
-        //uint ratio = transactionCount/repTokensBalance;
-        //require(ratio <=2,"Reputation too low to create a project!");
+        uint repTokensBalance = rep.balanceOf(msg.sender);
+        if(repTokensBalance == 0){
+           repTokensBalance = 1;
+        }
+        uint ratio = transactionCount/repTokensBalance;
+        require(ratio <=2,"Reputation too low to create a project!");
         p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0,index: projectCount[msg.sender]});
-        // p = Project(_name,_desc,_value,msg.sender,0,_value,transactions[-1] = t,0);
         projects[msg.sender].push(p);
         projectMap[pCount] = globalIndexToAdmin({admin: msg.sender, adminIndex: projectCount[msg.sender] });
         //Remove Duplicates
@@ -101,7 +97,6 @@ contract ProjectCreator{
         uint[] memory l = new uint[](length);
         address[] memory o = new address[](length);
         for (uint i=0;i<length;i++){
-           // Project memory pr =;
             n[i] =  projects[admin][i].name;
             d[i] =  projects[admin][i].description;
             l[i] =  projects[admin][i].limit;
@@ -116,8 +111,6 @@ contract ProjectCreator{
     }
     
     function submitProof(string memory link, address admin, uint index, uint transactionIndex) public{
-        //For what transaction?
-        //Add transaction to tobeverified transaction
         require(admin == msg.sender,"Invalid User");
         projects[admin][index].transactions[transactionIndex].proofLink = link;
         enqueue(projects[admin][index].transactions[transactionIndex]);
@@ -137,37 +130,32 @@ contract ProjectCreator{
     
     function dequeue() internal returns (Transaction memory data) {
         require(last >= first);  // non-empty queue
-
         data = queue[first];
-
         delete queue[first];
         first += 1;
     }
-    function withdraw(uint amount, uint index,string memory purpose) public returns (address admin1){
+    function withdraw(uint amount, uint index,string memory purpose) public{
         //Withdraw based on reputation
         //Based on Ratio of transactionCount and reputation.
         //Require statement not needed because i am using msg.sender
         uint transactionCount = projects[msg.sender][index].transactionSize;
-        //uint repTokensBalance = rep.balanceOf(msg.sender);
-        //if(repTokensBalance == 0){
-        //    repTokensBalance = 1;
-        //}
-       // uint ratio = transactionCount/repTokensBalance;
-        //require(ratio<=2,"Reputation Balance Low!");
-        //uint remainingValue = projects[msg.sender][index].donatedValue - projects[msg.sender][index].spentAmount;
-        //require(remainingValue > amount,"Invalid Withdrawal Amount");
+        uint repTokensBalance = rep.balanceOf(msg.sender);
+        if(repTokensBalance == 0){
+           repTokensBalance = 1;
+        }
+        uint ratio = transactionCount/repTokensBalance;
+        require(ratio<=2,"Reputation Balance Low!");
+        uint remainingValue = projects[msg.sender][index].donatedValue - projects[msg.sender][index].spentAmount;
+        require(remainingValue > amount,"Invalid Withdrawal Amount");
         msg.sender.transfer(amount);
         amount = amount / (10**18);
-        //projects[msg.sender][index].balance = projects[msg.sender][index].limit - amount;
         //Add transaction details
-        
         uint transactionSize = projects[msg.sender][index].transactionSize;
         Transaction memory t = Transaction(projects[msg.sender][index],purpose,amount,"",msg.sender,index,false,transactionSize);
         projects[msg.sender][index].transactions[transactionSize] = t;
         projects[msg.sender][index].transactionSize++;
         overallTransactionCount[msg.sender]++;
         projects[msg.sender][index].spentAmount = projects[msg.sender][index].spentAmount + amount;
-        return(msg.sender);
     }
     function checkLimit(uint donatedAmt, address admin, uint index) public view returns (bool isLimitReached){
         uint currentDonated = projects[admin][index].donatedValue;
@@ -179,8 +167,7 @@ contract ProjectCreator{
         }
         
     }
-    function viewReputationTokenBalance() public returns(uint){
-        reputationTokenBalance = rep.balanceOf(msg.sender);
+    function viewReputationTokenBalance() public view returns(uint){
         return rep.balanceOf(msg.sender);
     }
     function donatedAmount(uint donatedAmt, address admin, uint index) public {
