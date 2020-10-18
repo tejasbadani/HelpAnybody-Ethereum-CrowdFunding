@@ -17,7 +17,7 @@ contract Moderator{
         bool initialised;
     }
     Transaction t;
-    constructor(address _modToken, address _repToken, address _pCreator) public{
+    constructor(address _modToken, address _repToken, address payable _pCreator) public{
         
         mod = ModeratorToken(_modToken);
         rep = ReputationToken(_repToken);

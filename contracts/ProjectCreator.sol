@@ -25,6 +25,7 @@ contract ProjectCreator{
         bool verified;
         uint transactionIndex;
     }
+    
     ReputationToken rep;
     Project p;
     uint public pCount;
@@ -42,6 +43,10 @@ contract ProjectCreator{
  
     constructor(address _repToken) public{
         rep = ReputationToken(_repToken);
+    }
+
+    function showBalance()public returns(uint){
+        return address(this).balance;
     }
     function createProject(string memory _name, string memory _desc, uint _value) public{
         //Ratio between transactionCount count and reputation matters here
@@ -122,6 +127,13 @@ contract ProjectCreator{
 
         delete queue[first];
         first += 1;
+    }
+
+    receive() external payable{
+        //Emit transaction
+    }
+    fallback() external{
+        //Emit Cancellation
     }
     function withdraw(uint amount, uint index,string memory purpose) public{
         //Withdraw based on reputation
