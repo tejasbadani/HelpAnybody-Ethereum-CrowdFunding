@@ -25,7 +25,7 @@ contract ProjectCreator{
         bool verified;
         uint transactionIndex;
     }
-    struct gloablIndexToAdmin{
+    struct globalIndexToAdmin{
         address admin;
         uint adminIndex;
     }
@@ -42,10 +42,13 @@ contract ProjectCreator{
     address[] public keyList;
     uint public adminCount = 0;
     mapping (address => uint) overallTransactionCount;
+    uint public reputationTokenBalance;
 
  
     constructor(address _repToken) public{
         rep = ReputationToken(_repToken);
+        createProject("proj1","for testing a proj",500);
+        createProject("proj2","for testing another proj",250);
     }
     function showBalance()public returns(uint){
         return address(this).balance;
@@ -61,9 +64,12 @@ contract ProjectCreator{
         //If ratio is too low, no project creation
 
         uint transactionCount = overallTransactionCount[msg.sender];
-        uint repTokensBalance = rep.balanceOf(msg.sender);
-        uint ratio = transactionCount/repTokensBalance;
-        require(ratio <=2,"Reputation too low to create a project!");
+        //uint repTokensBalance = rep.balanceOf(msg.sender);
+        //if(repTokensBalance == 0){
+        //    repTokensBalance = 1;
+        //}
+        //uint ratio = transactionCount/repTokensBalance;
+        //require(ratio <=2,"Reputation too low to create a project!");
         p = Project({name: _name, description: _desc, limit: _value,admin: msg.sender,donatedValue: 0, balance: _value,transactionSize: 0,spentAmount:0,index: projectCount[msg.sender]});
         // p = Project(_name,_desc,_value,msg.sender,0,_value,transactions[-1] = t,0);
         projects[msg.sender].push(p);
@@ -79,10 +85,10 @@ contract ProjectCreator{
     }
     
     event ViewProject(string  name, string  desc,uint value,address admin);
-    function viewProject(address owner,uint index) public returns(string memory name, string memory desc,uint value,address admin){
+    function viewProject(address owner,uint index) public returns(string memory name, string memory desc,uint value,address admin, uint donatedValue, uint balance, uint transactionSize, uint spentAmount, uint index1){
         Project memory pr = projects[owner][index];
         emit ViewProject(pr.name,pr.description,pr.limit,pr.admin);
-        return (pr.name,pr.description,pr.limit,pr.admin);
+        return (pr.name,pr.description,pr.limit,pr.admin, pr.donatedValue, pr.balance, pr.transactionSize, pr.spentAmount, pr.index );
     }
     function returnProjectCountForCreator(address admin)external view returns (uint count){
         return projectCount[admin];
@@ -137,25 +143,31 @@ contract ProjectCreator{
         delete queue[first];
         first += 1;
     }
-    function withdraw(uint amount, uint index,string memory purpose) public{
+    function withdraw(uint amount, uint index,string memory purpose) public returns (address admin1){
         //Withdraw based on reputation
         //Based on Ratio of transactionCount and reputation.
         //Require statement not needed because i am using msg.sender
         uint transactionCount = projects[msg.sender][index].transactionSize;
-        uint repTokensBalance = rep.balanceOf(msg.sender);
-        uint ratio = transactionCount/repTokensBalance;
-        require(ratio<=2,"Reputation Balance Low!");
-        uint remainingValue = projects[msg.sender][index].donatedValue - projects[msg.sender][index].spentAmount;
-        require(remainingValue > amount,"Invalid Withdrawal Amount");
+        //uint repTokensBalance = rep.balanceOf(msg.sender);
+        //if(repTokensBalance == 0){
+        //    repTokensBalance = 1;
+        //}
+       // uint ratio = transactionCount/repTokensBalance;
+        //require(ratio<=2,"Reputation Balance Low!");
+        //uint remainingValue = projects[msg.sender][index].donatedValue - projects[msg.sender][index].spentAmount;
+        //require(remainingValue > amount,"Invalid Withdrawal Amount");
         msg.sender.transfer(amount);
+        amount = amount / (10**18);
         //projects[msg.sender][index].balance = projects[msg.sender][index].limit - amount;
         //Add transaction details
+        
         uint transactionSize = projects[msg.sender][index].transactionSize;
         Transaction memory t = Transaction(projects[msg.sender][index],purpose,amount,"",msg.sender,index,false,transactionSize);
         projects[msg.sender][index].transactions[transactionSize] = t;
         projects[msg.sender][index].transactionSize++;
         overallTransactionCount[msg.sender]++;
         projects[msg.sender][index].spentAmount = projects[msg.sender][index].spentAmount + amount;
+        return(msg.sender);
     }
     function checkLimit(uint donatedAmt, address admin, uint index) public view returns (bool isLimitReached){
         uint currentDonated = projects[admin][index].donatedValue;
@@ -167,10 +179,11 @@ contract ProjectCreator{
         }
         
     }
-    function viewReputationTokenBalance() public view returns(uint){
+    function viewReputationTokenBalance() public returns(uint){
+        reputationTokenBalance = rep.balanceOf(msg.sender);
         return rep.balanceOf(msg.sender);
     }
-    function donatedAmount(uint donatedAmt, address admin, uint index) public{
+    function donatedAmount(uint donatedAmt, address admin, uint index) public {
         projects[admin][index].donatedValue = projects[admin][index].donatedValue + donatedAmt;
         projects[admin][index].balance = projects[admin][index].limit - projects[admin][index].donatedValue;
     }
@@ -198,5 +211,8 @@ contract ProjectCreator{
         }
         emit ViewAllTransactions(purpose,value,proofLink,admin,verified,transactionIndex);
     }
-
+    function viewSingleTransaction(address admin, uint index, uint tindex) public returns (string memory purpose,uint value, string memory proofLink,bool verified) {
+        Transaction memory temp = projects[admin][index].transactions[tindex];
+        return(temp.purpose,temp.value, temp.proofLink,temp.verified);
+    }
 }
