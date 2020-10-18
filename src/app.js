@@ -350,8 +350,7 @@ SET_DONOR: async () => {
     console.log(proj)
 
     console.log("gonna Withdraw now")
-    x = await App.PC.withdraw(amount, projAdminIndex,reason)
-    console.log(x)
+    await App.PC.withdraw(amount, projAdminIndex,reason)
   },
 
   renderReputationBalance: async () => {
