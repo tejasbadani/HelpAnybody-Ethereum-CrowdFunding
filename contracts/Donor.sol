@@ -20,7 +20,7 @@ contract Donor{
         if(p.checkLimit(donation,admin,index) == true){
             //Message saying not possible to donate since limit has been crossed/ Invalid amount
         }else{
-            projectCreatorAdd.transfer(donation);
+            //projectCreatorAdd.transfer(donation);
             p.donatedAmount(donation,admin,index);
             //Emit event after this
             emit DonatedMoney(donor,donation,message,admin,index);

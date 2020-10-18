@@ -147,7 +147,7 @@ contract ProjectCreator{
         require(ratio<=2,"Reputation Balance Low!");
         uint remainingValue = projects[msg.sender][index].donatedValue - projects[msg.sender][index].spentAmount;
         require(remainingValue > amount,"Invalid Withdrawal Amount");
-        msg.sender.transfer(amount);
+        //msg.sender.transfer(amount);
         //projects[msg.sender][index].balance = projects[msg.sender][index].limit - amount;
         //Add transaction details
         uint transactionSize = projects[msg.sender][index].transactionSize;
