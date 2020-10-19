@@ -46,10 +46,10 @@ contract ProjectCreator{
     constructor(address _repToken) public{
         rep = ReputationToken(_repToken);
     }
-    function showBalance()public returns(uint){
+    function showBalance()public view returns(uint){
         return address(this).balance;
     }
-    function showEtherBalance() public returns(uint){
+    function showEtherBalance() public view returns(uint){
         return address(this).balance / (10**18);
     }
     receive() external payable{
@@ -204,7 +204,7 @@ contract ProjectCreator{
         }
         emit ViewAllTransactions(purpose,value,proofLink,admin,verified,transactionIndex);
     }
-    function viewSingleTransaction(address admin, uint index, uint tindex) public returns (string memory purpose,uint value, string memory proofLink,bool verified) {
+    function viewSingleTransaction(address admin, uint index, uint tindex) public view returns (string memory purpose,uint value, string memory proofLink,bool verified) {
         Transaction memory temp = projects[admin][index].transactions[tindex];
         return(temp.purpose,temp.value, temp.proofLink,temp.verified);
     }
