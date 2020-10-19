@@ -7,5 +7,7 @@ Steps:
 
 1. Clone files
 2. Npm install
-3. truffle migrate
-4. npm run dev
+3. Start Ganache
+4. Have Metamask in your primary browser and import a few accounts from Ganache
+5. truffle migrate
+6. npm run dev
