@@ -37,6 +37,7 @@ contract Moderator{
     event transferReputation(address receiver, address moderator);
     event transferModeratorToken(address receiver);
     function validateTransaction() public{
+        //TODO Should not be able to validate own transaction
         require(t.initialised == true,"Not initialised yet!");
         //Replace with transaction index
         project.makeTransactionValid(t.admin,t.index,t.transactionIndex);
