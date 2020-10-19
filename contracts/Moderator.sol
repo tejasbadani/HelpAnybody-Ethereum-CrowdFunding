@@ -38,6 +38,7 @@ contract Moderator{
     event transferModeratorToken(address receiver);
     function validateTransaction() public{
         //TODO Should not be able to validate own transaction
+        require(msg.sender != t.admin);
         require(t.initialised == true,"Not initialised yet!");
         //Replace with transaction index
         project.makeTransactionValid(t.admin,t.index,t.transactionIndex);
@@ -49,6 +50,7 @@ contract Moderator{
     }
     
     function rejectTransaction() public{
+        require(msg.sender != t.admin);
         require(t.initialised == true,"Not initialised yet!");
         mod.transferFrom(mod.returnOwner(),msg.sender,1);
         emit transferModeratorToken(msg.sender);
