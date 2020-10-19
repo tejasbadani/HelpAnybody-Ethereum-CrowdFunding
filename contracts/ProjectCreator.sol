@@ -45,11 +45,12 @@ contract ProjectCreator{
  
     constructor(address _repToken) public{
         rep = ReputationToken(_repToken);
-        createProject("proj1","for testing a proj",500);
-        createProject("proj2","for testing another proj",250);
     }
     function showBalance()public returns(uint){
         return address(this).balance;
+    }
+    function showEtherBalance() public returns(uint){
+        return address(this).balance / (10**18);
     }
     receive() external payable{
         //Receive Ether
@@ -129,11 +130,12 @@ contract ProjectCreator{
     }
     
     function dequeue() internal returns (Transaction memory data) {
-        require(last >= first);  // non-empty queue
+        require(last >= first,'Err');  // non-empty queue
         data = queue[first];
         delete queue[first];
         first += 1;
     }
+    
     function withdraw(uint amount, uint index,string memory purpose) public{
         //Withdraw based on reputation
         //Based on Ratio of transactionCount and reputation.
@@ -146,7 +148,8 @@ contract ProjectCreator{
         uint ratio = transactionCount/repTokensBalance;
         require(ratio<=2,"Reputation Balance Low!");
         uint remainingValue = projects[msg.sender][index].donatedValue - projects[msg.sender][index].spentAmount;
-        require(remainingValue > amount,"Invalid Withdrawal Amount");
+        uint amtInEther = amount / (10**18);
+        require(remainingValue > amtInEther,"Invalid Withdrawal Amount");
         msg.sender.transfer(amount);
         amount = amount / (10**18);
         //Add transaction details
@@ -177,6 +180,9 @@ contract ProjectCreator{
     
     function viewDonatedAmount(address admin, uint index)public view returns(uint value){
         return projects[admin][index].donatedValue;
+    }
+    function viewSpentAmount(address admin, uint index)public view returns(uint value){
+        return projects[admin][index].spentAmount;
     }
     function makeTransactionValid(address admin, uint index, uint transactionIndex)public{
         projects[admin][index].transactions[transactionIndex].verified = true;
