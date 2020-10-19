@@ -1,3 +1,3 @@
-# EmurgoNGO Project
+# Help Anybody Ethereum Crowd Funding 
 
-This is a new cleaner repo so we can merge all branches and keep trying stuff without messing up the repo. You can forget about the old repo.
+This is an ethereum based application that helps organisations and project leads maintain accountability and increase efficiency.
