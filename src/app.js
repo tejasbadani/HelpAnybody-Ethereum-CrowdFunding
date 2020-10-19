@@ -354,7 +354,7 @@ SET_DONOR: async () => {
   },
 
   renderReputationBalance: async () => {
-    const bal1 = await App.PC.reputationTokenBalance.call()
+    const bal1 = await App.PC.viewReputationTokenBalance.call()
     console.log("BALANCE")
     const bal = bal1.toNumber()
     console.log(bal)
@@ -383,7 +383,7 @@ SET_DONOR: async () => {
       const transaction = await App.PC.viewSingleTransaction.call(projAdmin,projAdminIndex,i)
       console.log(transaction)
       const purpose = transaction[0]
-      const value = transaction[1]
+      const value = transaction[1].toNumber()
       const proofLink = transaction[2]
       const verified = transaction[3]
       
@@ -492,6 +492,7 @@ SET_DONOR: async () => {
   genRandomTransactionMod: async () => {
     console.log("GEN RAND TRANSACTION")
     const randT = await App.PC.requestedRandomTransactionFromMod.call()
+    await App.PC.requestedRandomTransactionFromMod()
     console.log(randT)
 
     const purposeTransaction = randT[0]
@@ -676,14 +677,14 @@ SET_DONOR: async () => {
     //console.log(projAdminIndex)
     const proj = await App.PC.viewProject.call(projAdmin,projAdminIndex)
     //console.log(proj)
-    const $viewAllTransactionsTemplate = $('.viewAllTransactionsTemplateDonor')
+    const $viewAllTransactionsTemplateDonor = $('.viewAllTransactionsTemplateDonor')
     const tsize = proj[6].toNumber()
     for (var i = 0; i < tsize; i++) {
       
       const transaction = await App.PC.viewSingleTransaction.call(projAdmin,projAdminIndex,i)
       console.log(transaction)
       const purpose = transaction[0]
-      const value = transaction[1]
+      const value = transaction[1].toNumber()
       const proofLink = transaction[2]
       const verified = transaction[3]
       

@@ -17,8 +17,12 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <style>
+      @font-face {
+        font-family: 'nunito';
+        src: url('Nunito-Regular.ttf'); /* IE9 Compat Modes */
+      }
       body {
-        font-family: 'Lato', sans-serif;
+        font-family: 'nunito';
       }
       .sidenav {
         height: 100%;
@@ -65,15 +69,62 @@
   </head>
   <body>
     <div id="MAIN-PAGE">
-      <div onclick="App.SET_PROJECT_CREATOR()">Project Creator</div>
-      <div onclick="App.SET_MODERATOR()">Moderator</div>
-      <div onclick="App.SET_DONOR()">Donor</div>
+      <style>
+        * {
+          box-sizing: border-box;
+        }
+        
+        /* Create three unequal columns that floats next to each other */
+        .column {
+          float: left;
+          padding: 10px;
+          height: 300px; /* Should be removed. Only for demonstration */
+        }
+        
+        .left, .right {
+          width: 33%;
+        }
+        
+        .middle {
+          width: 34%;
+        }
+        
+        /* Clear floats after the columns */
+        .row:after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+      </style>
+      <div class="text-center"  style="background-color: #111; color: azure;">
+        <h1>Help Anyone</h1>
+        <div>===========================================</div>
+        <h4>Choose Your Role</h4>
+      </div>
+      <div class="row">
+        <div class="column left text-center" style="background-color: royalblue; cursor: pointer;">
+          <h1 onclick="App.SET_PROJECT_CREATOR()">Project Creator</h1>
+          
+        </div>
+        <div class="column middle text-center" style="background-color:goldenrod; cursor: pointer;">
+          <h1 onclick="App.SET_MODERATOR()">Moderator</h1>
+        
+        </div>
+        <div class="column right text-center" style="background-color:darkseagreen; cursor: pointer;">
+          <h1 onclick="App.SET_DONOR()">Donor</h1>
+        
+        </div>
+      </div>
+      <div class="text-center">
+        <h6>Creators</h6>
+        <p> tarunaravind2000@gmail.com | tejasbadani123@gmail.com | pitchappanprm@gmail.com | surapaneniarunsai@karunya.edu.in </p>
+      </div>
     </div>
 
     <div id="PROJECT-CREATOR">
       <!-- SIDEBAR -->
-      <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+      <div id="mySidenav" class="sidenav" style="background-color:royalblue; color: aliceblue;">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" >
           &times;
         </a>
         <a onclick="App.goToHome()">Home</a>
@@ -270,13 +321,11 @@
         </ul>
       </div>
 
-      <div id="homeHTML">
-        <div class="text-center">
-          THIS IS YOUR HOMEPAGE
-        </div>
+      <div id="homeHTML" class="text-center">
+        <img src="projC.jpg" alt="X">
       </div>
 
-      <div id="submitProofHTML">
+      <div id="submitProofHTML" class="text-center">
         <div>SUBMIT PROOF</div>
         <form onSubmit="App.submitProof(); return false;">
           <div class="form-group">
@@ -317,7 +366,7 @@
 
     <div id="MODERATOR">
       <!-- SIDEBAR -->
-      <div id="mySidenav1" class="sidenav">
+      <div id="mySidenav1" class="sidenav" style="background-color:goldenrod; color: aliceblue;">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav1()">
           &times;
         </a>
@@ -344,8 +393,8 @@
       </div>
       <!-- SIDEBAR -->
 
-      <div id="modHomeHTML" class="text-center">THIS IS MOD HOME</div>
-      <div id="validateTransactionHTML">
+      <div id="modHomeHTML" class="text-center"><img src="moderator.jpg" alt="x"></div>
+      <div id="validateTransactionHTML" class="text-center">
         <form onSubmit="App.genRandomTransactionMod(); return false;">
           <button type="submit" class="btn btn-default">Give me a transaction to validate</button>
         </form>
@@ -384,7 +433,7 @@
 
     <div id="DONOR">
       <!-- SIDEBAR -->
-      <div id="mySidenav2" class="sidenav">
+      <div id="mySidenav2" class="sidenav" style="background-color:darkseagreen; color: aliceblue;">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">
           &times;
         </a>
@@ -410,7 +459,9 @@
         </span>
       </div>
       <!-- SIDEBAR -->
-      <div id="donorHomeHTML" class="text-center">THIS IS DONOR HOME</div>
+      <div id="donorHomeHTML" class="text-center">
+        <img src="donor.png" alt="x" width="750" height="600">
+      </div>
       <div id="donateHTML">
         <form onSubmit="App.donateToProject(); return false;">
           <div class="form-group">
@@ -457,7 +508,7 @@
         </ul>
       </div>
       <div id="viewAllAdminsDonorHTML">
-          <div class="="text-center>ALL ADMINS</div>
+          <div class="text-center">ALL ADMINS</div>
           <ul id="allAdminsDonor" class="list-unstyled text-center">
             <div class="allAdminsDonorTemplate" style="border-style: solid;">
               <label>
@@ -466,7 +517,7 @@
             </div>
           </ul>
       </div>
-      <div id="viewAllTransactionsDonorHTML">
+      <div id="viewAllTransactionsDonorHTML" class="text-center">
         <div>TRANSACTIONS OF A PROJECT</div>
         <form onSubmit="App.transactionsOfProjectDonor(); return false;">
           <div class="form-group">
